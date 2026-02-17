@@ -39,7 +39,7 @@
   <!-- DISCOVER -->
   <div id="discover" class="screen active p-6">
     <div class="flex justify-end mb-4">
-      <button onclick="showFilters()" class="text-real-pink font-semibold flex items-center gap-2">
+      <button onclick="alert('Filtros avanzados en desarrollo')" class="text-real-pink font-semibold flex items-center gap-2">
         Filtros <span class="text-xl">⚙️</span>
       </button>
     </div>
@@ -47,4 +47,312 @@
     <div class="flex justify-center gap-8 mt-10">
       <button onclick="rewind()" class="nav-icon w-14 h-14 bg-white rounded-full flex items-center justify-center text-3xl shadow-md">⟲</button>
       <button onclick="swipe('left')" class="nav-icon w-20 h-20 bg-white rounded-full flex items-center justify-center text-6xl shadow-md">✕</button>
-      <button onclick="superLike()" class="nav-icon w-14 h-
+      <button onclick="superLike()" class="nav-icon w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center text-3xl shadow-md">⭐</button>
+      <button onclick="swipe('right')" class="nav-icon w-20 h-20 bg-gradient-real rounded-full flex items-center justify-center text-6xl shadow-md">♥</button>
+      <button onclick="boostProfile()" class="nav-icon w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center text-3xl shadow-md">🚀</button>
+    </div>
+    <div class="text-center mt-8 text-base text-zinc-600">Swipes hoy: <span id="swipes-left" class="text-real-pink font-bold">10</span></div>
+    <button onclick="verifyWorldID()" class="mt-10 w-full py-5 bg-gradient-real text-white text-xl font-bold rounded-2xl shadow-2xl">Verificar con World ID</button>
+  </div>
+
+  <!-- PROFILE -->
+  <div id="profile" class="screen p-6">
+    <div class="text-center">
+      <div class="grid grid-cols-3 gap-4 mb-8" id="photo-grid"></div>
+      <h2 id="my-name" class="text-4xl font-black mb-3">Tu Nombre</h2>
+      <p id="my-bio" class="text-xl text-zinc-600 mb-4">Bio aquí</p>
+      <p id="my-location" class="text-lg text-zinc-500 mb-6">Ubicación: Global</p>
+      <div id="my-prompts" class="mt-6 text-left text-base space-y-4"></div>
+    </div>
+
+    <div class="mt-10 space-y-5">
+      <button onclick="editProfile()" class="w-full py-5 bg-gradient-real text-white text-xl font-bold rounded-2xl shadow-2xl">Editar Perfil</button>
+      <label class="flex items-center gap-4 justify-center py-4 bg-white rounded-2xl shadow-sm">
+        <input type="checkbox" id="nearby-toggle" class="w-6 h-6 accent-real-pink">
+        <span class="text-lg">Solo cercanos (100 km)</span>
+      </label>
+      <button onclick="toggleInvisible()" class="w-full py-5 bg-white text-black text-xl font-bold rounded-2xl shadow-sm">Modo Invisible</button>
+      <button onclick="showSafetyCenter()" class="w-full py-5 bg-white text-black text-xl font-bold rounded-2xl shadow-sm">Safety Center</button>
+      <button onclick="showPremiumModal()" class="w-full py-5 bg-gradient-real text-white text-xl font-bold rounded-2xl shadow-2xl">Suscripción</button>
+    </div>
+  </div>
+
+  <!-- TOP PICKS -->
+  <div id="top-picks" class="screen p-6">
+    <h2 class="text-3xl font-black text-center mb-3">Top Picks del día</h2>
+    <p class="simulated-note">Simulado – Próximamente real</p>
+    <div id="top-picks-grid" class="grid grid-cols-2 gap-5 mt-8"></div>
+  </div>
+
+  <!-- EDIT PROFILE MODAL -->
+  <div id="edit-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50 overflow-y-auto">
+    <div class="bg-white rounded-3xl p-8 w-[92%] max-w-lg my-10 shadow-2xl">
+      <h2 class="text-3xl font-bold text-center mb-8 text-real-pink">Editar Perfil</h2>
+      <div class="space-y-6">
+        <div>
+          <label class="block text-lg mb-3 text-zinc-700">Sube hasta 3 fotos</label>
+          <input id="edit-photos" type="file" accept="image/*" multiple class="w-full p-5 bg-gray-50 rounded-2xl text-black text-lg border border-gray-300">
+        </div>
+        <input id="edit-name" type="text" placeholder="Nombre" class="w-full p-5 bg-gray-50 rounded-2xl text-black text-lg border border-gray-300">
+        <input id="edit-age" type="number" placeholder="Edad (18+)" min="18" class="w-full p-5 bg-gray-50 rounded-2xl text-black text-lg border border-gray-300">
+        <textarea id="edit-bio" placeholder="Bio (máx 500)" maxlength="500" class="w-full p-5 bg-gray-50 rounded-2xl text-black text-lg border border-gray-300 h-32"></textarea>
+        <input id="edit-prompt1" type="text" placeholder="Two truths and a lie" class="w-full p-5 bg-gray-50 rounded-2xl text-black text-lg border border-gray-300">
+        <input id="edit-prompt2" type="text" placeholder="My simple pleasures" class="w-full p-5 bg-gray-50 rounded-2xl text-black text-lg border border-gray-300">
+        <input id="edit-prompt3" type="text" placeholder="A random fact about me" class="w-full p-5 bg-gray-50 rounded-2xl text-black text-lg border border-gray-300">
+      </div>
+      <button onclick="saveProfile()" class="mt-10 w-full py-6 bg-gradient-real text-white text-2xl font-bold rounded-2xl shadow-2xl">Guardar Cambios</button>
+      <button onclick="document.getElementById('edit-modal').classList.add('hidden')" class="mt-4 w-full py-6 bg-gray-200 text-black text-2xl font-bold rounded-2xl">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- PREMIUM MODAL -->
+  <div id="premium-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div class="bg-white rounded-3xl p-8 w-[92%] max-w-lg shadow-2xl">
+      <h2 class="text-3xl font-bold text-center mb-8 text-real-pink">Elige tu plan</h2>
+      <div class="space-y-6">
+        <div onclick="subscribe('plus')" class="bg-gray-50 p-6 rounded-2xl cursor-pointer hover:bg-gray-100">
+          <div class="flex justify-between items-center text-xl">
+            <span class="font-bold">Plus</span>
+            <span class="text-real-pink font-bold">10 WLD/mes</span>
+          </div>
+        </div>
+        <div onclick="subscribe('gold')" class="bg-gray-50 p-6 rounded-2xl cursor-pointer border-2 border-yellow-400 hover:bg-gray-100">
+          <div class="flex justify-between items-center text-xl">
+            <span class="font-bold">Gold</span>
+            <span class="text-real-pink font-bold">25 WLD/mes</span>
+          </div>
+        </div>
+        <div onclick="subscribe('platinum')" class="bg-gray-50 p-6 rounded-2xl cursor-pointer hover:bg-gray-100">
+          <div class="flex justify-between items-center text-xl">
+            <span class="font-bold">Platinum</span>
+            <span class="text-real-pink font-bold">60 WLD/mes</span>
+          </div>
+        </div>
+      </div>
+      <button onclick="document.getElementById('premium-modal').classList.add('hidden')" class="mt-10 w-full py-6 bg-gray-200 text-black text-xl font-bold rounded-2xl">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="nav-bar fixed bottom-0 left-0 right-0 max-w-md mx-auto flex justify-around items-center py-5 text-4xl bg-white border-t border-gray-200 z-30 shadow-lg">
+    <button onclick="showScreen('discover')" class="nav-icon text-4xl transition-transform hover:text-real-pink active:scale-110">🔥</button>
+    <button onclick="showScreen('likes')" class="nav-icon text-4xl transition-transform hover:text-real-pink active:scale-110 text-gray-500">❤️</button>
+    <button onclick="showScreen('matches')" class="nav-icon text-4xl transition-transform hover:text-real-pink active:scale-110 text-gray-500">💬</button>
+    <button onclick="showScreen('profile')" class="nav-icon text-4xl transition-transform hover:text-real-pink active:scale-110 text-gray-500">👤</button>
+    <button onclick="showScreen('top-picks')" class="nav-icon text-4xl transition-transform hover:text-yellow-500 active:scale-110 text-gray-500">⭐</button>
+  </nav>
+
+  <script>
+    // ==================== FUNCIONES BÁSICAS (definidas al inicio para evitar "not defined") ====================
+    function showScreen(screen) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screen).classList.add('active');
+    }
+
+    function showPremiumModal() {
+      document.getElementById('premium-modal').classList.remove('hidden');
+    }
+
+    function rewind() { alert("Rewind usado"); }
+    function swipe(dir) { alert("Swipe " + dir); }
+    function superLike() { alert("Super Like enviado"); }
+    function boostProfile() { alert("Boost activado"); }
+
+    const SUPABASE_URL = "https://bogcdpwnnjxfgfdcewif.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvZ2NkcHdubmp4ZmdmZGNld2lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyOTM2MjgsImV4cCI6MjA4Njg2OTYyOH0.65pFiqgEmjogf73mZCG-yT2BZqx6Q8cbA_Ce9RhnIhQ";
+
+    const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const MERCHANT_WALLET = "0xdf4a991bc05945bd0212e773adcff6ea619f4c4b";
+
+    let currentUserId = null;
+    let tier = "free";
+    let nearbyOnly = false;
+    let currentMatchId = null;
+
+    // ==================== WORLD ID REAL ====================
+    async function verifyWorldID() {
+      if (!MiniKit.isInstalled()) return alert("Abre RealVibe dentro de World App");
+      try {
+        const { finalPayload } = await MiniKit.commandsAsync.verify({
+          action: "realvibe-verify",
+          signal: Date.now().toString(),
+          verification_level: "orb"
+        });
+        if (finalPayload.status === "success") {
+          currentUserId = finalPayload.proof;
+          await supabase.from("profiles").upsert({ id: currentUserId, tier: "free", photos: [] });
+          alert("✅ Verificado con World ID Orb. ¡Bienvenido!");
+          loadUserData();
+        }
+      } catch(e) { alert("Error en verificación"); }
+    }
+
+    async function loadUserData() {
+      const { data } = await supabase.from("profiles").select("*").eq("id", currentUserId).single();
+      if (data) {
+        tier = data.tier || "free";
+        document.getElementById("my-name").textContent = data.name || "Tu Nombre";
+        document.getElementById("my-bio").textContent = data.bio || "Humano verificado buscando vibes reales";
+        renderPhotos(data.photos || []);
+        document.getElementById("premium-badge").classList.toggle("hidden", tier === "free");
+      }
+    }
+
+    function renderPhotos(photos) {
+      const grid = document.getElementById("photo-grid");
+      grid.innerHTML = "";
+      photos.forEach(url => {
+        const img = document.createElement("img");
+        img.src = url;
+        img.className = "w-full h-32 object-cover rounded-2xl shadow-md border border-gray-200";
+        grid.appendChild(img);
+      });
+      for (let i = photos.length; i < 3; i++) {
+        const div = document.createElement("div");
+        div.className = "w-full h-32 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-400 text-lg shadow-md border border-gray-200";
+        div.textContent = "Foto " + (i+1);
+        grid.appendChild(div);
+      }
+    }
+
+    // ==================== EDICIÓN DE PERFIL ====================
+    async function editProfile() {
+      document.getElementById('edit-modal').classList.remove('hidden');
+    }
+
+    async function saveProfile() {
+      const fileInput = document.getElementById('edit-photos');
+      let newPhotos = [];
+
+      if (fileInput.files.length > 0) {
+        for (let file of fileInput.files) {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `\( {currentUserId || 'demo'}- \){Date.now()}.${fileExt}`;
+          const { data, error } = await supabase.storage.from('profile-photos').upload(fileName, file, { upsert: true });
+          if (error) {
+            alert("Error al subir foto: " + error.message);
+            return;
+          }
+          const publicUrl = `\( {SUPABASE_URL}/storage/v1/object/public/profile-photos/ \){fileName}`;
+          newPhotos.push(publicUrl);
+        }
+      }
+
+      const updates = {
+        name: document.getElementById('edit-name').value || "Tu Nombre",
+        bio: document.getElementById('edit-bio').value || "Humano verificado",
+        photos: newPhotos.length > 0 ? newPhotos : undefined
+      };
+
+      await supabase.from("profiles").update(updates).eq("id", currentUserId);
+      loadUserData();
+      document.getElementById('edit-modal').classList.add('hidden');
+      alert("¡Perfil actualizado con tus fotos!");
+    }
+
+    // ==================== PAGOS REALES ====================
+    async function payWithWorld(amountWLD, desc) {
+      if (!MiniKit.isInstalled()) return alert("Abre en World App para pagar real");
+      const payload = {
+        reference: Date.now().toString(),
+        to: MERCHANT_WALLET,
+        tokens: [{ symbol: "WLD", token_amount: (BigInt(amountWLD) * 1000000000000000000n).toString() }],
+        description: desc
+      };
+      try {
+        const { finalPayload } = await MiniKit.commandsAsync.pay(payload);
+        return finalPayload.status === "success";
+      } catch(e) {
+        alert("Error en pago");
+        return false;
+      }
+    }
+
+    async function subscribe(plan) {
+      const amounts = { plus: 10, gold: 25, platinum: 60 };
+      const success = await payWithWorld(amounts[plan], `RealVibe ${plan.toUpperCase()}`);
+      if (success) {
+        tier = plan;
+        await supabase.from("profiles").update({ tier }).eq("id", currentUserId);
+        alert(`¡${plan.toUpperCase()} activado!`);
+        loadUserData();
+      }
+    }
+
+    // ==================== FILTRO CERCANOS ====================
+    document.getElementById("nearby-toggle").addEventListener("change", e => {
+      nearbyOnly = e.target.checked;
+      alert(nearbyOnly ? "Solo perfiles cercanos (100 km)" : "Vista global activada");
+    });
+
+    // ==================== PRIVACIDAD GOLD+ ====================
+    async function toggleInvisible() {
+      if (tier !== "gold" && tier !== "platinum") return alert("Gold+ required");
+      alert("Modo invisible activado");
+    }
+
+    async function blockContacts() {
+      if (tier !== "gold" && tier !== "platinum") return alert("Gold+ required");
+      alert("Contactos bloqueados");
+    }
+
+    async function toggleZonePrivacy() {
+      if (tier !== "gold" && tier !== "platinum") return alert("Gold+ required");
+      alert("Zona privada activada (50 km)");
+    }
+
+    // ==================== SWIPE Y RENDER ====================
+    let profiles = [];
+    let currentProfileIndex = 0;
+
+    function renderCard() {
+      document.getElementById("card-stack").innerHTML = "<p class='text-center pt-40 text-2xl font-bold text-zinc-600'>Cargando perfiles reales...</p>";
+    }
+
+    function swipe(dir) { currentProfileIndex++; renderCard(); }
+    function superLike() { alert("Super Like enviado"); swipe('right'); }
+    function boostProfile() { alert("Boost activado"); }
+    function rewind() { alert("Rewind"); }
+
+    function showScreen(screen) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screen).classList.add('active');
+    }
+
+    function showPremiumModal() { document.getElementById('premium-modal').classList.remove('hidden'); }
+
+    // ==================== TOP PICKS SIMULADO ====================
+    function loadTopPicks() {
+      if (tier !== "gold" && tier !== "platinum") return alert("Solo para Gold+");
+      const demoProfiles = [
+        { name: "Ana", age: 26, bio: "Amante del café y viajes", img: "https://randomuser.me/api/portraits/women/44.jpg" },
+        { name: "Luis", age: 28, bio: "Música y buena vibra", img: "https://randomuser.me/api/portraits/men/45.jpg" },
+        { name: "Sofía", age: 24, bio: "Libros y conversaciones profundas", img: "https://randomuser.me/api/portraits/women/68.jpg" },
+        { name: "Mateo", age: 29, bio: "Aventuras y conexiones reales", img: "https://randomuser.me/api/portraits/men/22.jpg" },
+        { name: "Luna", age: 25, bio: "Perros y vibes auténticas", img: "https://randomuser.me/api/portraits/women/33.jpg" }
+      ];
+      const shuffled = demoProfiles.sort(() => Math.random() - 0.5);
+      const grid = document.getElementById("top-picks-grid");
+      grid.innerHTML = "";
+      shuffled.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "bg-white p-5 rounded-2xl text-center shadow-md";
+        div.innerHTML = `
+          <img src="${p.img}" class="w-28 h-28 mx-auto rounded-full object-cover mb-3 border-2 border-real-pink">
+          <p class="font-bold text-lg">${p.name}, ${p.age}</p>
+          <p class="text-sm text-zinc-600">${p.bio}</p>
+        `;
+        grid.appendChild(div);
+      });
+      showScreen('top-picks');
+    }
+
+    // ==================== INIT ====================
+    window.onload = () => {
+      showScreen('discover');
+      renderCard();
+    };
+  </script>
+</body>
+  </html>
