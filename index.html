@@ -3,183 +3,171 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>RealVibe - World App</title>
+<title>RealVibe</title>
 
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- Tailwind -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-
-<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- World MiniKit -->
 <script src="https://cdn.worldcoin.org/minikit/v1/minikit.js"></script>
 
 <style>
-body { font-family: 'Plus Jakarta Sans', sans-serif; background:#f8f9fa; }
-.gradient { background: linear-gradient(135deg,#ff69b4,#8a2be2); }
-.card-shadow { box-shadow:0 10px 30px rgba(0,0,0,.08); }
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#f8f9fa;}
+.gradient{background:linear-gradient(135deg,#ff69b4,#8a2be2);}
+.card{position:absolute;width:100%;height:100%;border-radius:20px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.1);background:#fff;touch-action:none;}
 </style>
 </head>
+<body>
 
-<body class="min-h-screen">
+<div class="max-w-md mx-auto p-4">
 
-<div id="app" class="max-w-md mx-auto p-4">
-
-<!-- HEADER -->
 <div class="flex justify-between items-center mb-4">
 <h1 class="text-2xl font-bold gradient text-transparent bg-clip-text">RealVibe</h1>
-<button id="verifyBtn" class="px-3 py-2 rounded-xl gradient text-white text-sm">Verify</button>
+<button id="verifyBtn" class="gradient text-white px-3 py-2 rounded-xl text-sm">Verify</button>
 </div>
 
-<!-- PROFILE EDIT -->
-<div id="profileSection" class="bg-white rounded-2xl p-4 card-shadow mb-4">
-<h2 class="font-semibold mb-2">Edit Profile</h2>
-<input id="name" placeholder="Name" class="w-full border p-2 rounded-xl mb-2">
-<input id="age" type="number" placeholder="Age" class="w-full border p-2 rounded-xl mb-2">
-<textarea id="bio" placeholder="Bio" class="w-full border p-2 rounded-xl mb-2"></textarea>
-<input type="file" id="photos" multiple accept="image/*" class="mb-2">
-<button id="saveProfile" class="w-full gradient text-white p-2 rounded-xl">Save</button>
+<!-- Swipe Area -->
+<div class="relative h-[500px] mb-4" id="swipeArea"></div>
+
+<div class="flex justify-between items-center">
+<button id="rewind" class="bg-gray-200 px-4 py-2 rounded-full">⟲</button>
+<button id="dislike" class="bg-red-100 text-red-500 px-6 py-3 rounded-full">✕</button>
+<button id="superlike" class="bg-blue-100 text-blue-500 px-6 py-3 rounded-full">★</button>
+<button id="like" class="gradient text-white px-6 py-3 rounded-full">♥</button>
+<button id="boost" class="bg-yellow-100 text-yellow-500 px-4 py-2 rounded-full">⚡</button>
 </div>
 
-<!-- DISCOVER -->
-<div id="discoverSection" class="bg-white rounded-2xl p-4 card-shadow mb-4">
-<h2 class="font-semibold mb-2">Discover</h2>
-<div id="cardContainer" class="relative h-96"></div>
-<div class="flex justify-between mt-3">
-<button id="dislike" class="px-4 py-2 bg-gray-200 rounded-xl">Nope</button>
-<button id="superlike" class="px-4 py-2 bg-blue-400 text-white rounded-xl">Super</button>
-<button id="like" class="px-4 py-2 gradient text-white rounded-xl">Like</button>
-</div>
-</div>
-
-<!-- CHAT -->
-<div id="chatSection" class="bg-white rounded-2xl p-4 card-shadow">
-<h2 class="font-semibold mb-2">Chat</h2>
+<!-- Chat -->
+<div class="mt-6 bg-white p-4 rounded-2xl shadow">
+<h2 class="font-bold mb-2">Chat</h2>
 <div id="messages" class="h-40 overflow-y-auto border rounded-xl p-2 mb-2"></div>
-<input id="messageInput" placeholder="Message..." class="w-full border p-2 rounded-xl mb-2">
-<button id="sendMessage" class="w-full gradient text-white p-2 rounded-xl">Send</button>
+<input id="msgInput" class="w-full border p-2 rounded-xl mb-2" placeholder="Message...">
+<button id="sendMsg" class="w-full gradient text-white p-2 rounded-xl">Send</button>
 </div>
 
 </div>
 
 <script>
-// ================= SUPABASE =================
+// SUPABASE
 const supabase = window.supabase.createClient(
 'https://bogcdpwnnjxfgfdcewif.supabase.co',
 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvZ2NkcHdubmp4ZmdmZGNld2lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyOTM2MjgsImV4cCI6MjA4Njg2OTYyOH0.65pFiqgEmjogf73mZCG-yT2BZqx6Q8cbA_Ce9RhnIhQ'
 )
 
-let currentUser = null
-let verified = false
+let verified=false
+let premium=false
+let swipeCount=0
+let profiles=[]
+let currentIndex=0
 
-// ================= WORLD ID =================
-document.getElementById('verifyBtn').onclick = async () => {
-if (!window.MiniKit) return alert("MiniKit not loaded")
-
-const result = await MiniKit.verify({
-action: "realvibe-verify",
-signal: ""
-})
-
-if(result.success){
-verified = true
-alert("Verified with World ID Orb")
-}
+// VERIFY WORLD ID
+document.getElementById("verifyBtn").onclick=async()=>{
+const result=await MiniKit.verify({action:"realvibe-verify"})
+if(result.success){verified=true;alert("World ID Verified")}
 }
 
-// ================= PAYMENTS =================
+// PAYMENTS
 async function pay(amount){
-const res = await MiniKit.pay({
-to: "0xdf4a991bc05945bd0212e773adcff6ea619f4c4b",
-tokens: [{ symbol: "WLD", amount: amount }]
+const res=await MiniKit.pay({
+to:"0xdf4a991bc05945bd0212e773adcff6ea619f4c4b",
+tokens:[{symbol:"WLD",amount:amount}]
 })
 return res.success
 }
 
-// ================= PROFILE SAVE =================
-document.getElementById('saveProfile').onclick = async () => {
-if(!verified) return alert("Verify first")
-
-const name = document.getElementById('name').value
-const age = document.getElementById('age').value
-const bio = document.getElementById('bio').value
-const files = document.getElementById('photos').files
-
-let photoUrls = []
-
-for(let i=0;i<files.length && i<3;i++){
-const { data, error } = await supabase.storage
-.from('profile-photos')
-.upload(`public/${Date.now()}-${files[i].name}`, files[i])
-
-if(!error){
-const { data:publicUrl } = supabase.storage
-.from('profile-photos')
-.getPublicUrl(data.path)
-
-photoUrls.push(publicUrl.publicUrl)
-}
-}
-
-await supabase.from('profiles').upsert({
-name, age, bio, photos: photoUrls
-})
-
-alert("Profile saved")
-}
-
-// ================= DISCOVER =================
+// LOAD PROFILES
 async function loadProfiles(){
-const { data } = await supabase.from('profiles').select('*')
-const container = document.getElementById('cardContainer')
-container.innerHTML = ""
+const {data}=await supabase.from("profiles").select("*")
+profiles=data||[]
+renderCards()
+}
 
-data.forEach(profile=>{
-const card = document.createElement('div')
-card.className="absolute w-full h-full bg-white rounded-2xl card-shadow p-4"
+function renderCards(){
+const area=document.getElementById("swipeArea")
+area.innerHTML=""
+profiles.slice(currentIndex,currentIndex+3).reverse().forEach((p,i)=>{
+const card=document.createElement("div")
+card.className="card p-4"
+card.style.zIndex=i
 card.innerHTML=`
-<img src="${profile.photos?.[0]||''}" class="w-full h-48 object-cover rounded-xl mb-2">
-<h3 class="font-bold">${profile.name}, ${profile.age}</h3>
-<p class="text-sm">${profile.bio||''}</p>
+<img src="${p.photos?.[0]||''}" class="w-full h-72 object-cover rounded-xl mb-3">
+<h3 class="text-xl font-bold">${p.name||''}, ${p.age||''}</h3>
+<p class="text-gray-600">${p.bio||''}</p>
 `
-container.appendChild(card)
+area.appendChild(card)
+addSwipe(card,p)
 })
 }
 
-loadProfiles()
-
-// ================= LIKE =================
-document.getElementById('like').onclick = async ()=>{
-await supabase.from('likes').insert({to_user:1})
-alert("Liked")
+function addSwipe(card,profile){
+let startX=0
+card.addEventListener("touchstart",e=>startX=e.touches[0].clientX)
+card.addEventListener("touchmove",e=>{
+let moveX=e.touches[0].clientX-startX
+card.style.transform=`translateX(${moveX}px) rotate(${moveX/10}deg)`
+})
+card.addEventListener("touchend",async e=>{
+let moveX=e.changedTouches[0].clientX-startX
+if(moveX>120) await like(profile)
+else if(moveX<-120) await dislike(profile)
+card.style.transform=""
+})
 }
 
-document.getElementById('superlike').onclick = async ()=>{
+// LIKE / DISLIKE
+async function like(profile){
+if(!premium && swipeCount>=10) return alert("Daily limit reached")
+swipeCount++
+await supabase.from("likes").insert({to_user:profile.id})
+next()
+}
+
+async function dislike(profile){
+if(!premium && swipeCount>=10) return alert("Daily limit reached")
+swipeCount++
+next()
+}
+
+function next(){
+currentIndex++
+renderCards()
+}
+
+// BUTTONS
+document.getElementById("like").onclick=()=>like(profiles[currentIndex])
+document.getElementById("dislike").onclick=()=>dislike(profiles[currentIndex])
+
+document.getElementById("superlike").onclick=async()=>{
 if(await pay(1)){
-await supabase.from('likes').insert({to_user:1, super:true})
-alert("Super Liked")
+await supabase.from("likes").insert({to_user:profiles[currentIndex].id,super:true})
+next()
 }
 }
 
-// ================= CHAT REALTIME =================
-supabase.channel('realtime-chat')
-.on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},payload=>{
-const msgDiv=document.createElement('div')
-msgDiv.textContent=payload.new.content
-document.getElementById('messages').appendChild(msgDiv)
+document.getElementById("boost").onclick=async()=>{
+if(await pay(5)) alert("Boost activated")
+}
+
+document.getElementById("rewind").onclick=()=>{
+if(currentIndex>0){currentIndex--;renderCards()}
+}
+
+// CHAT REALTIME
+supabase.channel("chat")
+.on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},payload=>{
+const msg=document.createElement("div")
+msg.textContent=payload.new.content
+document.getElementById("messages").appendChild(msg)
 })
 .subscribe()
 
-document.getElementById('sendMessage').onclick=async()=>{
-const content=document.getElementById('messageInput').value
-await supabase.from('messages').insert({content})
-document.getElementById('messageInput').value=""
+document.getElementById("sendMsg").onclick=async()=>{
+const content=document.getElementById("msgInput").value
+await supabase.from("messages").insert({content})
+document.getElementById("msgInput").value=""
 }
 
+loadProfiles()
 </script>
 
 </body>
-  </html>
+</html>
