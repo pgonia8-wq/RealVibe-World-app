@@ -11,7 +11,7 @@
   <style>
     body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: #f8f9fa; color: #111; margin: 0; overflow-x: hidden; }
     .header { background: linear-gradient(to bottom, rgba(255,105,180,0.12), transparent); position: fixed; top: 0; left: 0; right: 0; max-width: 28rem; margin: 0 auto; z-index: 20; backdrop-filter: blur(12px); }
-    .card { transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 12px 32px rgba(0,0,0,0.12); border-radius: 24px; overflow: hidden; background: white; }
+    .card { transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 12px 32px rgba(0,0,0,0.12); border-radius: 24px; overflow: hidden; background: white; position: absolute; width: 100%; height: 480px; }
     .swipe-left { transform: translateX(-140%) rotate(-28deg) !important; opacity: 0; }
     .swipe-right { transform: translateX(140%) rotate(28deg) !important; opacity: 0; }
     .text-real-pink { color: #ff69b4; }
@@ -22,10 +22,6 @@
     .nav-icon:hover { transform: scale(1.15); color: #ff69b4; }
     .screen { display: none; padding-top: 90px; padding-bottom: 100px; }
     .screen.active { display: block; }
-    .chat-msg { max-width: 78%; padding: 12px 18px; border-radius: 22px; margin-bottom: 10px; font-size: 15px; line-height: 1.4; }
-    .chat-msg-sent { background: linear-gradient(to right, #ff69b4, #ff8ac0); color: white; align-self: flex-end; }
-    .chat-msg-received { background: #f1f1f1; color: #111; align-self: flex-start; }
-    .simulated-note { font-size: 10px; color: #aaa; text-align: center; margin: 6px 0; }
   </style>
 </head>
 <body>
@@ -143,7 +139,7 @@
   </nav>
 
   <script>
-    // ==================== FUNCIONES BÁSICAS (definidas al inicio para evitar "not defined") ====================
+    // ==================== FUNCIONES BÁSICAS ====================
     function showScreen(screen) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(screen).classList.add('active');
@@ -168,7 +164,6 @@
     let currentUserId = null;
     let tier = "free";
     let nearbyOnly = false;
-    let currentMatchId = null;
 
     // ==================== WORLD ID REAL ====================
     async function verifyWorldID() {
@@ -302,29 +297,14 @@
       alert("Zona privada activada (50 km)");
     }
 
-    // ==================== SWIPE Y RENDER ====================
+    // ==================== SWIPE Y RENDER (con tarjetas reales) ====================
     let profiles = [];
     let currentProfileIndex = 0;
 
     function renderCard() {
-      document.getElementById("card-stack").innerHTML = "<p class='text-center pt-40 text-2xl font-bold text-zinc-600'>Cargando perfiles reales...</p>";
-    }
+      const stack = document.getElementById("card-stack");
+      stack.innerHTML = "";
 
-    function swipe(dir) { currentProfileIndex++; renderCard(); }
-    function superLike() { alert("Super Like enviado"); swipe('right'); }
-    function boostProfile() { alert("Boost activado"); }
-    function rewind() { alert("Rewind"); }
-
-    function showScreen(screen) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(screen).classList.add('active');
-    }
-
-    function showPremiumModal() { document.getElementById('premium-modal').classList.remove('hidden'); }
-
-    // ==================== TOP PICKS SIMULADO ====================
-    function loadTopPicks() {
-      if (tier !== "gold" && tier !== "platinum") return alert("Solo para Gold+");
       const demoProfiles = [
         { name: "Ana", age: 26, bio: "Amante del café y viajes", img: "https://randomuser.me/api/portraits/women/44.jpg" },
         { name: "Luis", age: 28, bio: "Música y buena vibra", img: "https://randomuser.me/api/portraits/men/45.jpg" },
@@ -332,20 +312,24 @@
         { name: "Mateo", age: 29, bio: "Aventuras y conexiones reales", img: "https://randomuser.me/api/portraits/men/22.jpg" },
         { name: "Luna", age: 25, bio: "Perros y vibes auténticas", img: "https://randomuser.me/api/portraits/women/33.jpg" }
       ];
-      const shuffled = demoProfiles.sort(() => Math.random() - 0.5);
-      const grid = document.getElementById("top-picks-grid");
-      grid.innerHTML = "";
-      shuffled.forEach(p => {
-        const div = document.createElement("div");
-        div.className = "bg-white p-5 rounded-2xl text-center shadow-md";
-        div.innerHTML = `
-          <img src="${p.img}" class="w-28 h-28 mx-auto rounded-full object-cover mb-3 border-2 border-real-pink">
-          <p class="font-bold text-lg">${p.name}, ${p.age}</p>
-          <p class="text-sm text-zinc-600">${p.bio}</p>
+
+      demoProfiles.forEach((p, index) => {
+        const card = document.createElement("div");
+        card.className = `card absolute w-full h-[480px] flex flex-col items-center justify-center text-center ${index === 0 ? '' : 'hidden'}`;
+        card.innerHTML = `
+          <img src="${p.img}" class="w-full h-80 object-cover">
+          <div class="p-6">
+            <p class="text-3xl font-black">${p.name}, ${p.age}</p>
+            <p class="text-zinc-600 mt-2">${p.bio}</p>
+          </div>
         `;
-        grid.appendChild(div);
+        stack.appendChild(card);
       });
-      showScreen('top-picks');
+    }
+
+    function swipe(dir) {
+      currentProfileIndex++;
+      renderCard();
     }
 
     // ==================== INIT ====================
