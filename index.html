@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RealVibe ❤️</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@worldcoin/minikit-js@latest/dist/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: #f8f9fa; color: #111; margin: 0; overflow-x: hidden; }
+    .header { background: linear-gradient(to bottom, rgba(255,105,180,0.12), transparent); position: fixed; top: 0; left: 0; right: 0; max-width: 28rem; margin: 0 auto; z-index: 20; backdrop-filter: blur(12px); }
+    .card { transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 12px 32px rgba(0,0,0,0.12); border-radius: 24px; overflow: hidden; background: white; }
+    .swipe-left { transform: translateX(-140%) rotate(-28deg) !important; opacity: 0; }
+    .swipe-right { transform: translateX(140%) rotate(28deg) !important; opacity: 0; }
+    .text-real-pink { color: #ff69b4; }
+    .bg-real-pink { background-color: #ff69b4; }
+    .bg-gradient-real { background: linear-gradient(135deg, #ff69b4, #8a2be2); }
+    .nav-bar { background: white; border-top: 1px solid #eee; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); backdrop-filter: blur(12px); position: fixed; bottom: 0; left: 0; right: 0; max-width: 28rem; margin: 0 auto; z-index: 30; }
+    .nav-icon { transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); color: #666; }
+    .nav-icon:hover { transform: scale(1.15); color: #ff69b4; }
+    .screen { display: none; padding-top: 90px; padding-bottom: 100px; }
+    .screen.active { display: block; }
+    .chat-msg { max-width: 78%; padding: 12px 18px; border-radius: 22px; margin-bottom: 10px; font-size: 15px; line-height: 1.4; }
+    .chat-msg-sent { background: linear-gradient(to right, #ff69b4, #ff8ac0); color: white; align-self: flex-end; }
+    .chat-msg-received { background: #f1f1f1; color: #111; align-self: flex-start; }
+    .simulated-note { font-size: 10px; color: #aaa; text-align: center; margin: 6px 0; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header p-5 flex justify-between items-center">
+    <h1 class="text-3xl font-black bg-gradient-real bg-clip-text text-transparent tracking-tight">RealVibe</h1>
+    <div id="premium-badge" onclick="showPremiumModal()" class="hidden text-xs bg-white/80 backdrop-blur-md px-4 py-2 rounded-full font-semibold cursor-pointer border border-pink-200 shadow-sm">PREMIUM</div>
+  </header>
+
+  <!-- DISCOVER -->
+  <div id="discover" class="screen active p-6">
+    <div class="flex justify-end mb-4">
+      <button onclick="showFilters()" class="text-real-pink font-semibold flex items-center gap-2">
+        Filtros <span class="text-xl">⚙️</span>
+      </button>
+    </div>
+    <div id="card-stack" class="relative h-[520px] mt-2"></div>
+    <div class="flex justify-center gap-8 mt-10">
+      <button onclick="rewind()" class="nav-icon w-14 h-14 bg-white rounded-full flex items-center justify-center text-3xl shadow-md">⟲</button>
+      <button onclick="swipe('left')" class="nav-icon w-20 h-20 bg-white rounded-full flex items-center justify-center text-6xl shadow-md">✕</button>
+      <button onclick="superLike()" class="nav-icon w-14 h-
